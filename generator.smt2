@@ -20,7 +20,9 @@
 (assert (! (=> (or stage5 tier4) def)                    :named def-required))
 (assert (! (=> def (exactlyOne tank7d tank10d tank14d))  :named tank-choice))
 (assert (! (=> (or stage3 stage5) dnv)                   :named dnv-required))
+(assert (! (not (and tier4 dnv))                         :named no-dnv-with-tier4))
 (assert (! (=> tier4 boem)                               :named boem-required))
+(assert (! (not (and (or stage3 stage5) boem))           :named no-boem-with-stage5-stage3))
 
 ; ---- Example configurations (complete) ----
 (declare-const config1 Bool)   ; valid
