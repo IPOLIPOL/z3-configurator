@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 set -e
 
@@ -6,7 +7,11 @@ input=$(printf '%s\n' "$input" | tr '\n' ' ' | sed 's/(/ ( /g; s/)/ ) /g')
 read -ra tokens <<< "$input"
 
 i=0
-advance() { token="${tokens[i]}"; i=$((i + 1)); }
+
+advance() {
+    token="${tokens[i]}"
+    i=$((i + 1))
+}
 
 parse_node() {
     local indent="$1"
@@ -14,21 +19,22 @@ parse_node() {
 
     advance                      # (
     advance                      # node
-    advance                      # "Name"
+
     local name="${token//\"/}"
-    advance                      # qty
+    advance                      # quantity
+
     local qty="$token"
-    advance                      # children marker: nil, or ( starting a cons list
+    advance                      # children
 
     printf '%s%s%s × %s\n' "$indent" "$branch" "$name" "$qty"
 
     if [[ "$token" == "nil" ]]; then
-        advance                  # )  closes this node
+        advance                  # )
         return
     fi
 
-    parse_list "$indent    "     # token is already "(" of the child list
-    advance                      # )  closes this node
+    parse_list "$indent    "
+    advance                      # )
 }
 
 parse_list() {
@@ -36,14 +42,17 @@ parse_list() {
 
     advance                      # (
     if [[ "$token" == "nil" ]]; then
-        advance                  # )  closes the empty list
+        advance                  # )
         return
     fi
 
     advance                      # cons
-    parse_node "$indent" "├── "  # leaves token positioned right after its own )
-    parse_list "$indent"         # tail, same indent — siblings don't nest deeper
-    advance                      # )  closes this cons cell
+
+    parse_node "$indent" "├── "
+    parse_list "$indent"
+
+    advance                      # )
 }
 
 parse_node "" ""
+
