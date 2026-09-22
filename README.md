@@ -68,3 +68,26 @@ SMT solvers only return one solution at a time. To find **all** possible valid c
   (check-sat) ; Returns unsat (No more variations left!)
 (pop 1)
 ```
+
+### Executing Inert Gas BOM Generation in REPL
+
+```smt2
+(include "inertgas.smt2")
+(assert (= nDist 40))   
+(assert (= nStand 4))
+(assert (= zones 20))
+(check-sat)
+sat
+(eval bom-dist)
+(eval bom-stand)
+(eval bom)
+```
+
+### Pretty-Print Your BOM Tree
+
+Делаем файл исполняемым: `chmod +x pretty-bom.sh`
+Запускаете скрипт: `./pretty-bom.sh`
+Используйте код с осторожностью. Вставляете ваш текст из Z3. 
+Нажимаете Enter (перейти на новую пустую строку).
+Нажимаете комбинацию клавиш Ctrl + D (сигнал терминалу «я закончил вставлять данные»).
+Cкрипт мгновенно выдаст идеально чистое дерево.
