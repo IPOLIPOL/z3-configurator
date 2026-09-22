@@ -14,6 +14,21 @@
 
 
 ; ------------------------------------------------------------
+; 0. Printer options
+;
+; Without these, Z3 factors repeated/large subterms into
+; "let"-bound aliases (a!1, a!2, ...) once a term passes a
+; size threshold, and prints those blocks out of the order
+; you'd expect. Raising the threshold and the depth limit
+; makes eval print bom-dist / bom-stand / bom as one plain,
+; top-to-bottom term instead.
+; ------------------------------------------------------------
+
+(set-option :pp.min_alias_size 1000000)
+(set-option :pp.max_depth 1000)
+
+
+; ------------------------------------------------------------
 ; 1. Input variables
 ; ------------------------------------------------------------
 

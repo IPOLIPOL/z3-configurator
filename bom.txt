@@ -1,0 +1,42 @@
+(node "CylinderBankDistribution"
+      1
+      (cons (node "InertGasCylinder" 8 nil)
+            (cons (node "MT_Manifold" 2 nil)
+                  (cons (node "SV22PipePressureSwitchKit" 3 nil)
+                        (cons (node "DischargeValve" 8 nil)
+                              (cons (node "InertGasHose" 8 nil)
+                                    (cons (node "Manoswitch5K6CableIEC331_5.0m"
+                                                1
+                                                nil)
+                                          (cons (node "SolenoidActuator" 3 nil)
+                                                (cons (node "SVCiVStartKit"
+                                                            3
+                                                            nil)
+                                                      (cons (node "SV22ZoneKit"
+                                                                  3
+                                                                  nil)
+                                                            (cons (node "SVTestPortKit"
+                                                                        3
+                                                                        nil)
+                                                                  (cons (node "SVCiNextKit070Elbow"
+                                                                              1
+                                                                              nil)
+                                                                        (cons (node "SVCiNextKit028Straight"
+                                                                                    6
+                                                                                    nil)
+                                                                              (cons (node "SV22EndPlugKit"
+                                                                                          1
+                                                                                          nil)
+                                                                                    (cons (node "StainlessSteelTube_m"
+                                                                                                6
+                                                                                                nil)
+                                                                                          (cons (node "CylinderRail_m"
+                                                                                                      16
+                                                                                                      nil)
+                                                                                                (cons (node "CylinderBracket"
+                                                                                                            8
+                                                                                                            nil)
+                                                                                                      (cons (node "CylinderLabel"
+                                                                                                                  8
+                                                                                                                  nil)
+                                                                                                            nil))))))))))))))))))
