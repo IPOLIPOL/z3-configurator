@@ -26,6 +26,7 @@ Instead of pasting code into the REPL line-by-line, you can execute your `.smt2`
 ```bash
 z3 generator.smt2
 ```
+
 *Note: Ensure your script has a command like `(check-sat)` at the bottom, or Z3 will execute quietly without terminal printouts.*
 
 ---
@@ -33,6 +34,7 @@ z3 generator.smt2
 ## 💡 Common Diagnostic Patterns
 
 ### 1. The Push/Pop Sandbox Pattern
+
 To test temporary conditions without modifying or overriding your core business rules permanently, wrap your testing queries inside a `(push 1)` and `(pop 1)` block:
 
 ```smt2
@@ -46,6 +48,7 @@ To test temporary conditions without modifying or overriding your core business 
 ```
 
 ### 2. Multi-Solution Discovery (All-SAT) Pattern
+
 SMT solvers only return one solution at a time. To find **all** possible valid combinations for a given setup, find a solution, copy its core assignments, assert their negation to block them, and check again:
 
 ```smt2
@@ -85,9 +88,9 @@ sat
 
 ### Pretty-Print Your BOM Tree
 
-Делаем файл исполняемым: `chmod +x pretty-bom.sh`
-Запускаете скрипт: `./pretty-bom.sh`
-Используйте код с осторожностью. Вставляете ваш текст из Z3. 
-Нажимаете Enter (перейти на новую пустую строку).
-Нажимаете комбинацию клавиш Ctrl + D (сигнал терминалу «я закончил вставлять данные»).
-Cкрипт мгновенно выдаст идеально чистое дерево.
+- Делаем файл исполняемым: `chmod +x pretty-bom.sh` - эта команда нужна только раз в самом начале на устройстве
+- Запускаете скрипт: `./pretty-bom.sh`
+- Используйте код с осторожностью. Вставляете ваш текст из Z3.
+- Нажимаете Enter (перейти на новую пустую строку).
+- Нажимаете комбинацию клавиш `Ctrl + D` (сигнал терминалу «я закончил вставлять данные»). или вставьте `EOF`
+- Cкрипт мгновенно выдаст идеально чистое дерево.

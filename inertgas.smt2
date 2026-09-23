@@ -5,7 +5,8 @@
 ; Inputs:
 ;   nDist  - cylinders in CylinderBankDistribution
 ;   nStand - cylinders in CylinderBankStandAlone
-;   zones  - number of protected zones
+;   zones  - number of protected zones by CylinderBankDistribution
+;   zones_s  - number of protected zones by CylinderBankStandAlone
 ;
 ; 0 cylinders means that the corresponding bank does not exist.
 ;
@@ -26,7 +27,7 @@
 (declare-const nDist Int)
 (declare-const nStand Int)
 (declare-const zones Int)
-
+(declare-const zones_s Int)
 ; ------------------------------------------------------------
 ; 2. Validation rules
 ; ------------------------------------------------------------
@@ -38,6 +39,7 @@
 (assert (<= nStand 100))
 
 (assert (>= zones 0))
+(assert (>= zones_s 0))
 
 ; ------------------------------------------------------------
 ; 3. Helper functions
@@ -61,7 +63,8 @@
   (
     (
       (node
-        (name String)
+        (component_name String)
+        (variant_name String)
         (quantity Int)
         (children NodeList))
     )
@@ -91,7 +94,7 @@
 
 
 ; ------------------------------------------------------------
-; 6. Distribution-bank components
+; 6. Distribution-bank components quantities
 ; ------------------------------------------------------------
 
 (define-fun dist_cylinders () Int
@@ -136,8 +139,13 @@
        zones
        0))
 
-(define-fun dist_activation_kit () Int
+(define-fun dist_activation_kit_elbow () Int
   (ite (> nDist 0) 1 0))
+
+(define-fun dist_activation_kit_straight () Int
+  (ite (> nDist 2)
+       (- nDist 2)
+       0))
 
 (define-fun dist_end_plug () Int
   (ite (> nDist 0) 1 0))
@@ -147,9 +155,18 @@
        (* 2 zones)
        0))
 
+(define-fun dist_seal_plastic_red () Int
+  nDist)
+
+(define-fun dist_seal_wire_finess_ss () Int
+  nDist)
+
 (define-fun dist_rail_m () Int
-  (ite (> nDist 0)
-       (* nDist 2)
+  nDist)
+
+(define-fun dist_rail_covers () Int
+    (ite (> nDist 0)
+       8
        0))
 
 (define-fun dist_brackets () Int
@@ -160,16 +177,21 @@
 
 
 ; ------------------------------------------------------------
-; 7. Stand-alone-bank components
+; 7. Stand-alone-bank components quantities
 ; ------------------------------------------------------------
 
 (define-fun stand_cylinders () Int
   nStand)
 
 (define-fun stand_manifolds () Int
-  (ite (> nStand 0) 1 0))
+    (ite (> nDist 0)
+       zones_s
+       0))
 
 (define-fun stand_pressure_switches () Int
+  (ite (> nStand 0) 1 0))
+
+(define-fun ci_mt_orifice_kit () Int
   (ite (> nStand 0) 1 0))
 
 (define-fun stand_discharge_valves () Int
@@ -182,13 +204,22 @@
   (ite (> nStand 0) 1 0))
 
 (define-fun stand_solenoid_actuators () Int
-  (ite (> nStand 0)
-       zones
+    (ite (> nDist 0)
+       zones_s
        0))
 
+(define-fun stand_seal_plastic_red () Int
+  nStand)
+
+(define-fun stand_seal_wire_finess_ss () Int
+  nStand)
+
 (define-fun stand_rail_m () Int
-  (ite (> nStand 0)
-       nStand
+  nDist)
+
+(define-fun stand_rail_covers () Int
+    (ite (> nStand 0)
+       4
        0))
 
 (define-fun stand_brackets () Int
@@ -205,91 +236,70 @@
 (define-fun bom-dist () Node
 
   (node
-    "CylinderBankDistribution"
+    "CylinderBank" "CylinderBankDistribution"
     1
 
     (cons
-      (node "InertGasCylinder" dist_cylinders nil)
+      (node "InertGasCylinder" "Cylinder80300M25DNV" dist_cylinders nil)
 
       (cons
-        (node "MT_Manifold" dist_manifolds nil)
+        (node "MT_Manifold" "SV22_MT_X_Manifold" dist_manifolds nil)
 
         (cons
-          (node "SV22PipePressureSwitchKit"
-                dist_pressure_switches
-                nil)
+          (node "SV22PipePressureSwitchKit" "SV22PipePSKit5K6IEC331" dist_pressure_switches nil)
 
           (cons
-            (node "DischargeValve"
-                  dist_discharge_valves
-                  nil)
+            (node "DischargeValve" "CiIV8300ManoswitchIEC331" dist_discharge_valves nil)
 
             (cons
-              (node "InertGasHose"
-                    dist_hoses
-                    nil)
+              (node "InertGasHose" "HoseDn10400L1000Aisi316" dist_hoses nil)
 
               (cons
-                (node "Manoswitch5K6CableIEC331_5.0m"
-                      dist_signal_cables
-                      nil)
+                (node "InertGasCable" "Manoswitch5K6CableIEC331_5.0m" dist_signal_cables nil)
 
                 (cons
-                  (node "SolenoidActuator"
-                        dist_solenoid_actuators
-                        nil)
-
-                  (cons
-                    (node "SVCiVStartKit"
-                          dist_start_kits
-                          nil)
+                  (node "SolenoidActuator" "CiIS8BSolenoidManualSemco" dist_solenoid_actuators nil)
 
                     (cons
-                      (node "SV22ZoneKit"
-                            dist_zone_kits
-                            nil)
-
-                      (cons
-                        (node "SVTestPortKit"
-                              dist_test_ports
-                              nil)
+                      (node "SV22ZoneKit" "SV22ZoneKitNpt1CalibrCiV" dist_zone_kits nil)
 
                         (cons
-                          (node "SVCiNextKit070Elbow"
-                                dist_activation_kit
-                                nil)
+                          (node "PneumaticActivationKit" "SVCiNextKit070Elbow" dist_activation_kit_elbow nil)
 
                           (cons
-                            (node "SVCiNextKit028Straight"
-                                  (ite (> nDist 2)
-                                       (- nDist 2)
-                                       0)
-                                  nil)
+                            (node "PneumaticActivationKit" "SVCiNextKit028Straight" dist_activation_kit_straight nil)
 
                             (cons
-                              (node "SV22EndPlugKit"
-                                    dist_end_plug
-                                    nil)
-
-                              (cons
-                                (node "StainlessSteelTube_m"
-                                      dist_stainless_tube_m
-                                      nil)
+                                (node "SVBuildComponent" "SVCiVStartKit" dist_start_kits nil)
 
                                 (cons
-                                  (node "CylinderRail_m"
-                                        dist_rail_m
-                                        nil)
-
-                                  (cons
-                                    (node "CylinderBracket"
-                                          dist_brackets
-                                          nil)
+                                    (node "SVBuildComponent" "SVTestPortKit" dist_test_ports nil)
 
                                     (cons
-                                      (node "CylinderLabel" dist_labels nil)
+                                      (node "SVBuildComponent" "SV22EndPlugKit" dist_end_plug nil)
 
-                                      nil)))))))))))))))))
+                                        (cons
+                                          (node "InertGasAccessories" "StainlessSteelTube_m" dist_stainless_tube_m nil)
+
+                                            (cons
+                                            (node "InertGasAccessories" "SealPlasticRed" dist_seal_plastic_red nil)
+
+                                            (cons
+                                                (node "InertGasAccessories" "SealWireFinessSS" dist_seal_wire_finess_ss nil)
+
+                                                (cons
+                                                    (node "CylinderRail" "CylinderRailCylRailxcylStainless_m" dist_rail_m nil)
+
+                                                    (cons
+                                                    (node "CylinderRailCover" "CylinderRailEndCover" dist_rail_covers nil)
+
+                                                        (cons
+                                                        (node "CylinderBracket" "CylBracket2x80KtAisi316" dist_brackets nil)
+
+                                                        (cons
+                                                            (node "Label" "CylinderLabel" dist_labels nil)
+
+                                                nil))))))))))))))))))))
 ))
 
 
@@ -300,60 +310,52 @@
 (define-fun bom-stand () Node
 
   (node
-    "CylinderBankStandAlone"
+    "CylinderBank" "CylinderBankStandAlone"
     1
 
     (cons
-      (node "InertGasCylinder"
-            stand_cylinders
-            nil)
+      (node "InertGasCylinder" "Cylinder80300M25DNV" stand_cylinders nil)
 
       (cons
-        (node "Ci_MT_Manifold"
-              stand_manifolds
-              nil)
+        (node "MT_Manifold" "Ci_MT_Manifold" stand_manifolds nil)
 
         (cons
-          (node "CiMTPressureSwitchKit5K6IEC331"
-                stand_pressure_switches
-                nil)
+          (node "CiMTPressureSwitchKit" "CiMTPressureSwitchKit5K6IEC331" stand_pressure_switches nil)
 
           (cons
-            (node "DischargeValve"
-                  stand_discharge_valves
-                  nil)
+            (node "CiMTOrificeKit" "CiMTnptOrificeKitCalibrated" ci_mt_orifice_kit nil)
 
             (cons
-              (node "InertGasHose"
-                    stand_hoses
-                    nil)
-
-              (cons
-                (node "Manoswitch5K6CableIEC331_5.0m"
-                      stand_signal_cables
-                      nil)
+                (node "DischargeValve" "CiIV8300ManoswitchIEC331" stand_discharge_valves nil)
 
                 (cons
-                  (node "SolenoidActuator"
-                        stand_solenoid_actuators
-                        nil)
-
-                  (cons
-                    (node "CylinderRail_m"
-                          stand_rail_m
-                          nil)
+                    (node "InertGasHose" "HoseDn10400L1000Aisi316" stand_hoses nil)
 
                     (cons
-                      (node "CylinderBracket"
-                            stand_brackets
-                            nil)
+                      (node "InertGasCable" "Manoswitch5K6CableIEC331_5.0m" stand_signal_cables nil)
 
                       (cons
-                        (node "CylinderLabel"
-                              stand_labels
-                              nil)
+                        (node "SolenoidActuator" "CiIS8BSolenoidManualSemco" stand_solenoid_actuators nil)
 
-                        nil))))))))))
+                        (cons
+                          (node "InertGasAccessories" "SealPlasticRed" stand_seal_plastic_red nil)
+
+                            (cons
+                              (node "InertGasAccessories" "SealWireFinessSS" stand_seal_wire_finess_ss nil)
+
+                                (cons
+                                  (node "CylinderRail" "CylinderRailCylRailxcylStainless_m" stand_rail_m nil)
+
+                                    (cons
+                                      (node "CylinderRailCover" "CylinderRailEndCover" stand_rail_covers nil)
+
+                                        (cons
+                                          (node "CylinderBracket" "CylBracket3050LKit25Aisi316" stand_brackets nil)
+
+                                            (cons
+                                              (node "Label" "CylinderLabel" stand_labels nil)
+
+                                                nil))))))))))))))
 ))
 
 
@@ -367,12 +369,14 @@
 
   (node
     "InertGasSystem"
+    "InertGasSystem"
     1
 
     (cons
       (ite (> nDist 0)
            bom-dist
            (node "No_CylinderBankDistribution"
+                 ""
                  0
                  nil))
 
@@ -380,6 +384,7 @@
         (ite (> nStand 0)
              bom-stand
              (node "No_CylinderBankStandAlone"
+                   ""
                    0
                    nil))
 
@@ -396,6 +401,7 @@
 ; (assert (= nDist 8))
 ; (assert (= nStand 4))
 ; (assert (= zones 3))
+; (assert (= zones_s 2))
 
 ; (check-sat)
 
