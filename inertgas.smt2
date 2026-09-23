@@ -184,7 +184,7 @@
   nStand)
 
 (define-fun stand_manifolds () Int
-    (ite (> nDist 0)
+    (ite (> nStand 0)
        zones_s
        0))
 
@@ -204,7 +204,7 @@
   (ite (> nStand 0) 1 0))
 
 (define-fun stand_solenoid_actuators () Int
-    (ite (> nDist 0)
+    (ite (> nStand 0)
        zones_s
        0))
 
@@ -215,7 +215,7 @@
   nStand)
 
 (define-fun stand_rail_m () Int
-  nDist)
+  nStand)
 
 (define-fun stand_rail_covers () Int
     (ite (> nStand 0)

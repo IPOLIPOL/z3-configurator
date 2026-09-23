@@ -9,7 +9,10 @@ if [[ -z "$zones" ]]; then
 fi
 
 query() {
-    cat inertgas.smt2 - <<SMT | z3 -in | tail -n +2
+    {
+        cat inertgas.smt2
+        printf '\n'
+        cat <<SMT
 (assert (= nDist $nDist))
 (assert (= nStand $nStand))
 (assert (= zones $zones))
@@ -17,6 +20,7 @@ query() {
 (check-sat)
 (eval $1)
 SMT
+    } | z3 -in | tail -n +2
 }
 
 echo "== Distribution =="
